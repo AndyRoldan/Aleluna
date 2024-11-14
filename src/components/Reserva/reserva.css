@@ -1,0 +1,194 @@
+/* Fuentes elegantes */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Raleway:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+
+/* Estilo general del cuerpo */
+body, html {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  background-color: #000;
+  color: #f5f5f5;
+  font-family: 'Raleway', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Contenedor principal de la reserva que ocupa toda la pantalla */
+.reserva-page {
+  min-height: 100vh;
+  padding-top: 100px; /* Espacio para la navbar */
+  background-color: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Título principal */
+.reserva-page h1 {
+  font-family: 'Great Vibes', cursive;
+  font-size: 5em;
+  color: #f0a500;
+  text-shadow: 0px 0px 10px rgba(255, 223, 43, 0.7);
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Contenedor del contenido central */
+.reserva-container {
+  max-width: 900px;
+  width: 100%;
+  padding: 40px;
+  background-color: #1f1f1f;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+  margin-top: 20px;
+  margin-bottom: 40px;
+  color: #f5f5f5;
+}
+
+/* Sección de selección de paquete */
+.package-selection {
+  margin-bottom: 20px;
+}
+
+.package-selection label {
+  font-size: 1.5rem;
+  color: #f0a500;
+}
+
+.package-selection select {
+  width: 100%;
+  font-size: 1rem;
+  padding: 12px;
+  margin-top: 5px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #333;
+  color: #f5f5f5;
+}
+
+/* Sección de servicios adicionales */
+.services-section {
+  margin-bottom: 20px;
+}
+
+.services-section label {
+  font-size: 1.3rem;
+  color: #f0a500;
+}
+
+.service-images {
+  display: flex;
+  justify-content: space-around;
+  gap: 20px;
+}
+
+.service-item {
+  text-align: center;
+  cursor: pointer;
+}
+
+.service-item img {
+  width: 150px;
+  height: 100px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
+}
+
+.service-item img:hover {
+  transform: scale(1.05);
+}
+
+/* Estilos para el modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #1f1f1f;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1.5rem;
+  color: #f0a500;
+  cursor: pointer;
+}
+
+.modal-content h2 {
+  font-size: 2rem;
+  color: #f0a500;
+}
+
+.modal-content p {
+  color: #ddd;
+  margin-top: 10px;
+}
+
+.modal-content button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #f0a500;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* Precio total */
+.summary h2 {
+  font-size: 2rem;
+  color: #f0a500;
+  font-weight: bold;
+}
+
+/* Botón de confirmación */
+.primary-btn {
+  width: 100%;
+  padding: 15px;
+  font-size: 1.2rem;
+  color: #fff;
+  background-color: #f0a500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.primary-btn:hover {
+  background-color: #d49400;
+}
+
+/* Mensajes de éxito y error */
+.success-message, .error-text {
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.success-message {
+  color: #28a745;
+}
+
+.error-text {
+  color: #dc3545;
+}

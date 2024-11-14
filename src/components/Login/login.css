@@ -1,0 +1,105 @@
+/* Fuentes elegantes */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Raleway:wght@400&display=swap');
+
+/* Contenedor principal del formulario de login */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  padding-top: 100px; /* Aumenta el espacio para la navbar */
+  background-color: #111; /* Fondo oscuro */
+  color: #f5f5f5;
+  font-family: 'Raleway', sans-serif;
+}
+
+/* Caja del formulario de login */
+.login-box {
+  background-color: #1f1f1f; /* Fondo oscuro para la caja */
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  color: #f5f5f5;
+}
+
+.logo img {
+  width: 250x;
+  margin-bottom: 20px;
+}
+
+h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #f0a500; /* Color dorado */
+  font-family: 'Playfair Display', serif;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  outline: none;
+  background-color: #333;
+  color: #f5f5f5;
+}
+
+input:focus {
+  border-color: #1e90ff;
+  box-shadow: 0 0 5px rgba(30, 144, 255, 0.5);
+}
+
+.primary-btn {
+  width: 100%;
+  background-color: #f0a500; /* Botón en dorado */
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  
+  
+}
+
+.primary-btn:hover {
+  background-color: #d49400; /* Más dorado en hover */
+  
+}
+
+.primary-btn:disabled {
+  background-color: #ffcc80;
+  cursor: not-allowed;
+}
+
+.error-text {
+  color: red;
+}
+
+.success-message {
+  color: green;
+  margin-top: 10px;
+}
+.register-link {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #f5f5f5;
+}
+
+.register-link a {
+  color: #f0a500;
+  text-decoration: none;
+  font-weight: bold;
+  
+}
+
+.register-link a:hover {
+  text-decoration: underline;
+}
+
