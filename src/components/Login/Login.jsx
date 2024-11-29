@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Loader from '../Loader/Loader';
 import './login.css';
 
 const Login = ({ onLogin }) => {
@@ -41,15 +40,27 @@ const Login = ({ onLogin }) => {
 
         const { userId, userName } = data;
         console.log('Login exitoso, ID del usuario:', userId);
-        localStorage.setItem('isAuthenticated', true);
-        localStorage.setItem('userId', userId);
-        localStorage.setItem('userName', userName);
-        onLogin(userId, userName);
+
+        // **Guardar en localStorage**
+        localStorage.setItem('isAuthenticated', true); // Marcar al usuario como autenticado
+        localStorage.setItem('userId', userId); // Guardar el ID del usuario
+        localStorage.setItem('userName', userName); // Guardar el nombre del usuario
+
+        // **Verificar que el ID se guardó correctamente**
+        console.log("ID del usuario almacenado en localStorage:", localStorage.getItem('userId'));
+
+        // **Llamar al método onLogin (si existe)**
+        if (onLogin) {
+          onLogin(userId, userName);
+        }
+
+        // **Redirigir al usuario a la página principal**
         navigate('/');
       } else {
         setError(data.error || 'Error en el inicio de sesión');
       }
     } catch (err) {
+      console.error('Error en el inicio de sesión:', err);
       setError('Error al conectarse con el servidor');
     } finally {
       setLoading(false);
@@ -60,7 +71,7 @@ const Login = ({ onLogin }) => {
     <div className="login-container">
       <div className="login-box">
         <div className="logo">
-        <img src="https://i.ibb.co/6Ncyyz4/Logo-Aleluna.png" alt="Logo-Aleluna" border="0"></img>
+          <img src="https://i.ibb.co/6Ncyyz4/Logo-Aleluna.png" alt="Logo-Aleluna" />
         </div>
         <h2>Iniciar Sesión</h2>
         <form onSubmit={handleLogin}>
@@ -93,7 +104,7 @@ const Login = ({ onLogin }) => {
           {success && <p className="success-text">{success}</p>}
         </form>
         <p className="register-link">
-          ¿No posees cuenta? <Link to="/registro">Regístrate</Link>
+          ¿No tienes cuenta? <Link to="/registro">Regístrate</Link>
         </p>
       </div>
     </div>

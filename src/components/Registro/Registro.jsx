@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Loader from '../Loader/Loader'; // Asegúrate de que el componente Loader esté disponible
 import './registro.css'; // Asegúrate de importar tu CSS
 
 const Registro = () => {
