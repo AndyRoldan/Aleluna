@@ -1,111 +1,257 @@
-import React, { useState, useEffect } from 'react';
-import './reserva.css';
+import React, { useState, useEffect } from "react";
+import "./reserva.css";
 
-const Reserva = ({ isAuthenticated, userId }) => {
-  const [packages, setPackages] = useState([]); // Estado para almacenar los paquetes
-  const [selectedPackage, setSelectedPackage] = useState(''); // Paquete seleccionado
-  const [price, setPrice] = useState(0); // Precio basado en el paquete seleccionado
-  const [additionalServices, setAdditionalServices] = useState([]);
+const Reserva = () => {
+  const [id_cliente, setIdCliente] = useState(null); // Estado para almacenar el ID del cliente
+  const [paquetes, setPaquetes] = useState([]);
+  const [selectedPaquete, setSelectedPaquete] = useState(null);
+  const [selectedPaqueteDetails, setSelectedPaqueteDetails] = useState(null);
+  const [limosinas, setLimosinas] = useState([]);
+  const [locales, setLocales] = useState([]);
+  const [selectedLimosina, setSelectedLimosina] = useState(null);
+  const [selectedLocal, setSelectedLocal] = useState(null);
+  const [selectedLocalDetails, setSelectedLocalDetails] = useState(null);
+  const [fechaReserva, setFechaReserva] = useState("");
+  const [horaInicio, setHoraInicio] = useState("");
+  const [horaFin, setHoraFin] = useState("");
   const [success, setSuccess] = useState(null);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
 
-  // Obtener los paquetes desde la API al montar el componente
+  // Recuperar el ID del cliente desde localStorage al cargar el componente
   useEffect(() => {
-    const fetchPackages = async () => {
+    const storedIdCliente = localStorage.getItem("userId");
+    console.log("ID del cliente recuperado:", storedIdCliente);
+    setIdCliente(storedIdCliente); // Guardar el ID del cliente en el estado
+  }, []);
+
+  // Cargar datos desde la API
+  useEffect(() => {
+    const fetchData = async (url, setData) => {
       try {
-        const response = await fetch('http://localhost:3077/api/packages');
-        if (!response.ok) throw new Error('Error al obtener paquetes');
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error("Error al cargar los datos");
+        }
         const data = await response.json();
-        setPackages(data); // Guardar los paquetes en el estado
+        setData(data);
       } catch (err) {
-        console.error('Error al cargar paquetes:', err);
-        setError('Error al cargar los paquetes');
+        console.error(`Error al cargar datos desde ${url}:`, err);
+        setError("No se pudieron cargar los datos.");
       }
     };
 
-    fetchPackages();
+    fetchData("http://localhost:3077/api/packages", setPaquetes);
+    fetchData("http://localhost:3077/api/limosinas", setLimosinas);
+    fetchData("http://localhost:3077/api/locales", setLocales);
   }, []);
 
-  // Manejar el cambio de selección de paquete
-  const handlePackageChange = (e) => {
-    const packageId = e.target.value;
-    const selected = packages.find(pkg => pkg.id === packageId);
-    setSelectedPackage(packageId);
-    setPrice(selected ? selected.precio : 0); // Establecer el precio según el paquete seleccionado
+  // Seleccionar paquete y obtener detalles
+  const handlePaqueteChange = (id) => {
+    console.log(`Paquete seleccionado: ${id}`);
+    setSelectedPaquete(id);
+    const paquete = paquetes.find((pkg) => pkg.id === id);
+    if (paquete) setSelectedPaqueteDetails(paquete);
+  };
+
+  // Seleccionar local y obtener detalles
+  const handleLocalChange = (id) => {
+    console.log(`Local seleccionado: ${id}`);
+    setSelectedLocal(id);
+    const local = locales.find((loc) => loc.id === id);
+    if (local) setSelectedLocalDetails(local);
+  };
+
+  // Seleccionar limosina
+  const handleLimosinaChange = (id) => {
+    console.log(`Limosina seleccionada: ${id}`);
+    setSelectedLimosina(id);
   };
 
   // Enviar la reserva al backend
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isAuthenticated) {
-      setError('Debes iniciar sesión para reservar.');
-      return;
-    }
-
-    setLoading(true);
     setError(null);
     setSuccess(null);
 
+    const fecha_reserva = fechaReserva
+      ? new Date(fechaReserva).toISOString().split("T")[0]
+      : null;
+
+    const body = {
+      id_cliente: id_cliente,
+      id_paquete: selectedPaquete,
+      id_local: selectedLocal,
+      id_limusina: selectedLimosina,
+      fecha_reserva: fecha_reserva,
+      hora_inicio: horaInicio,
+      hora_fin: horaFin,
+    };
+
+    console.log("Datos enviados al backend:", body);
+
     try {
-      const response = await fetch('http://localhost:3077/api/reserve', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId,
-          package: selectedPackage,
-          additionalServices,
-          price
-        }),
+      const response = await fetch("http://localhost:3077/api/reservas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
       });
 
-      const data = await response.json();
-      if (response.ok) {
-        setSuccess('Reserva realizada con éxito');
-      } else {
-        setError(data.error || 'Error al realizar la reserva');
+      if (!response.ok) {
+        const data = await response.json();
+        console.error("Error recibido desde el backend:", data);
+        throw new Error(data.error || "Error al crear la reserva");
       }
+
+      const data = await response.json();
+      console.log("Respuesta recibida del backend:", data);
+
+      setSuccess("Reserva creada exitosamente");
     } catch (err) {
-      setError('Error al conectarse con el servidor');
-    } finally {
-      setLoading(false);
+      setError(err.message || "Ocurrió un error inesperado al crear la reserva.");
     }
   };
 
   return (
-    <div className="reserva-page">
-      <h1>Reserva tu Paquete</h1>
-      <div className="reserva-container">
-        
-        {/* Selección de Paquete */}
-        <div className="package-selection">
-          <label htmlFor="package">Selecciona un Paquete</label>
-          <select id="package" value={selectedPackage} onChange={handlePackageChange} required>
-            <option value="">Selecciona un paquete</option>
-            {packages.map(pkg => (
-              <option key={pkg.id} value={pkg.id}>
-                {pkg.nombre} - ${pkg.precio}
-              </option>
+    <div className="reserva-container">
+      {id_cliente ? (
+        <div className="reserva-box">
+          <h1>Crear Reserva</h1>
+
+          {/* Paquetes */}
+          <fieldset>
+            <legend>Paquetes de Fotos</legend>
+            {paquetes.map((paquete) => (
+              <div key={paquete.id}>
+                <label>
+                  <input
+                    type="radio"
+                    name="paquete"
+                    value={paquete.id}
+                    onChange={() => handlePaqueteChange(paquete.id)}
+                  />
+                  {paquete.nombre} - ${paquete.precio}
+                </label>
+              </div>
             ))}
-          </select>
+            {selectedPaqueteDetails && (
+              <table className="details-table">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>Duración</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{selectedPaqueteDetails.nombre}</td>
+                    <td>{selectedPaqueteDetails.descripcion}</td>
+                    <td>${selectedPaqueteDetails.precio}</td>
+                    <td>{selectedPaqueteDetails.hora_servicio} horas</td>
+                  </tr>
+                </tbody>
+              </table>
+            )}
+          </fieldset>
+
+          {/* Limosinas */}
+          <fieldset>
+            <legend>Limosinas</legend>
+            {limosinas.map((limosina) => (
+              <div key={limosina.id_limosina}>
+                <label>
+                  <input
+                    type="radio"
+                    name="limosina"
+                    value={limosina.id_limosina}
+                    onChange={() => handleLimosinaChange(limosina.id_limosina)}
+                  />
+                  {limosina.modelo} - Capacidad: {limosina.capacidad} - ${limosina.precio_por_hora}
+                </label>
+              </div>
+            ))}
+          </fieldset>
+
+          {/* Locales */}
+          <fieldset>
+            <legend>Locales</legend>
+            {locales.map((local) => (
+              <div key={local.id}>
+                <label>
+                  <input
+                    type="radio"
+                    name="local"
+                    value={local.id}
+                    onChange={() => handleLocalChange(local.id)}
+                  />
+                  {local.nombre_local} - {local.direccion} - ${local.precio_por_hora}
+                </label>
+              </div>
+            ))}
+            {selectedLocalDetails && (
+              <table className="details-table">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Dirección</th>
+                    <th>Precio</th>
+                    <th>Capacidad</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>{selectedLocalDetails.nombre_local}</td>
+                    <td>{selectedLocalDetails.direccion}</td>
+                    <td>${selectedLocalDetails.precio_por_hora}</td>
+                    <td>{selectedLocalDetails.capacidad} personas</td>
+                  </tr>
+                </tbody>
+              </table>
+            )}
+          </fieldset>
+
+          {/* Fecha y Hora */}
+          <fieldset>
+            <legend>Detalles de la Reserva</legend>
+            <div>
+              <label>
+                Fecha de Reserva:
+                <input
+                  type="date"
+                  value={fechaReserva}
+                  onChange={(e) => setFechaReserva(e.target.value)}
+                />
+              </label>
+              <label>
+                Hora de Inicio:
+                <input
+                  type="time"
+                  value={horaInicio}
+                  onChange={(e) => setHoraInicio(e.target.value)}
+                />
+              </label>
+              <label>
+                Hora de Fin:
+                <input
+                  type="time"
+                  value={horaFin}
+                  onChange={(e) => setHoraFin(e.target.value)}
+                />
+              </label>
+            </div>
+          </fieldset>
+
+          {/* Botón de Enviar */}
+          <button onClick={handleSubmit}>Reservar</button>
+
+          {/* Mensajes */}
+          {success && <p className="success-message">{success}</p>}
+          {error && <p className="error-text">{error}</p>}
         </div>
-
-        {/* Resumen del precio */}
-        <div className="summary">
-          <h2>Precio Total: ${price}</h2>
-        </div>
-
-        {/* Botón de confirmación */}
-        <button type="submit" className="primary-btn" onClick={handleSubmit} disabled={loading}>
-          {loading ? 'Reservando...' : 'Confirmar Reserva'}
-        </button>
-
-        {/* Mensajes de éxito o error */}
-        {error && <p className="error-text">{error}</p>}
-        {success && <p className="success-message">{success}</p>}
-      </div>
+      ) : (
+        <p>Cargando datos del cliente...</p>
+      )}
     </div>
   );
 };

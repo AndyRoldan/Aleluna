@@ -5,6 +5,10 @@ const bodyParser = require("body-parser");
 
 const app = express();
 const port = process.env.PORT || 3077;
+app.listen(port, () => {
+  console.log(`Servidor corriendo en el puerto ${port}`);
+});
+
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -52,50 +56,213 @@ app.post("/api/login", async (req, res) => {
     // Verificar si el usuario existe
     const user = await pool.query('SELECT * FROM usuario WHERE email = $1', [email]);
     
+    // Log para verificar el contenido de 'user'
+    console.log("Resultado de la consulta a la base de datos:", user.rows);
+
     if (user.rows.length === 0) {
       return res.status(400).json({ error: 'Usuario no encontrado' });
     }
 
     const storedPassword = user.rows[0].password;
-    const userId = user.rows[0].id;  // Aquí obtenemos el ID del usuario
+    const userId = user.rows[0].id; // Verifica el nombre del campo aquí
+    const userName = user.rows[0].nombre;
 
-    // Comparar la contraseña con la almacenada en la base de datos (sin encriptación)
-    const validPassword = password === storedPassword;
+    // Comparar la contraseña con la almacenada en la base de datos
+    const validPassword = password === storedPassword; // Reemplazar con bcrypt.compare si usas hashing
 
     if (!validPassword) {
       return res.status(400).json({ error: 'Contraseña incorrecta' });
     }
 
-    // Si todo es correcto, devolver el nombre del usuario
+    console.log("Inicio de sesión exitoso para el usuario:", { userId, userName });
+
+
+    // Devolver el ID y el nombre del usuario
     res.status(200).json({
       message: 'Inicio de sesión exitoso',
-      userId,  // Devolvemos el userId
-      userName: user.rows[0].nombre  // Devolver el nombre del usuario en la respuesta
+      userId,
+      userName,
     });
   } catch (err) {
-    console.error('Error en el inicio de sesión:', err);
+    console.error('Error en el inicio de sesión:', err.message);
     res.status(500).json({ error: 'Error del servidor' });
   }
 });
 
 //**************************************************************************************************************************************************************
 //*******************************************************************OBTENER PAQUETES******************************************************************************************* */
-
-// Ruta para obtener todos los paquetes de fotografía
 app.get("/api/packages", async (req, res) => {
   try {
-    // Consultar todos los paquetes desde la tabla "paquete_fotos"
-    const result = await pool.query('SELECT nombre, precio FROM paquetesfotos');
-    
-    // Enviar los paquetes como respuesta
-    res.status(200).json(result.rows)
+    const query = `
+     SELECT 
+        id_paquete AS id,
+        nombre,
+        descripcion,
+        precio,
+        hora_servicio,
+        modo_entrega,
+        tipo_album,
+        pre_sesion,
+        foto_impresa,
+        slideShow,
+        transmision,
+        pantalla_digital,
+        cabina_fotos,
+        galeria_fotos
+      FROM 
+        paquetesfotos;
+    `;
+    const result = await pool.query(query);
+    res.status(200).json(result.rows); // Devuelve los datos de los paquetes
   } catch (err) {
-    console.error('Error al obtener paquetes:', err.message);
-    res.status(500).json({ error: 'Error al obtener paquetes' });
+    console.error("Error al obtener paquetes:", err.message);
+    res.status(500).json({ error: "Error al obtener paquetes" });
   }
 });
 
-const PORT = 3077;
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en el puerto ${PORT}`);
+// Obtener limosinas disponibles
+app.get("/api/limosinas", async (req, res) => {
+  try {
+    const query = `
+     SELECT 
+    l.id_limosina,
+    l.modelo,
+    l.capacidad,
+    l.precio_por_hora,
+    e.nombre AS estado
+FROM 
+    limosinas l
+JOIN 
+    Estado e
+ON 
+    l.id_estado = e.id_estado;
+    `;
+    const result = await pool.query(query);
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("Error al obtener limosinas:", err.message);
+    res.status(500).json({ error: "Error al obtener limosinas" });
+  }
+});
+
+//**************************************************************************************************************************************************************
+//*******************************************************************LOCALES******************************************************************************************* */
+
+// Obtener locales disponibles
+app.get("/api/locales", async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        l.id_local AS id,
+        l.nombre_local,
+        l.direccion,
+        l.precio_por_hora,
+        l.capacidad,
+        e.nombre AS estado
+      FROM 
+        locales l
+      JOIN 
+        Estado e
+      ON 
+        l.id_estado = e.id_estado
+      WHERE 
+        e.nombre = 'Disponible';
+    `;
+    const result = await pool.query(query);
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("Error al obtener locales:", err.message);
+    res.status(500).json({ error: "Error al obtener locales" });
+  }
+});
+//**************************************************************************************************************************************************************
+//*******************************************************************RESERVAS******************************************************************************************* */
+// Crear reserva
+app.post("/api/reservas", async (req, res) => {
+  const {
+    id_cliente,
+    id_paquete,
+    fecha_reserva,
+    hora_inicio,
+    hora_fin,
+    id_estado, // Esto es opcional, por defecto se usará el estado 'Pendiente' si no se pasa
+    id_local,
+    id_limusina,
+  } = req.body;
+
+  // Log para verificar los datos recibidos del frontend
+  console.log("Datos recibidos del frontend:", req.body);
+
+  try {
+    // Validar que los campos obligatorios estén presentes
+    if (!id_cliente || !id_paquete || !fecha_reserva || !hora_inicio || !hora_fin) {
+      const missingFields = [];
+      if (!id_cliente) missingFields.push("id_cliente");
+      if (!id_paquete) missingFields.push("id_paquete");
+      if (!fecha_reserva) missingFields.push("fecha_reserva");
+      if (!hora_inicio) missingFields.push("hora_inicio");
+      if (!hora_fin) missingFields.push("hora_fin");
+
+      console.error("Campos faltantes:", missingFields);
+      return res.status(400).json({
+        error: "Faltan datos obligatorios para la reserva",
+        missingFields,
+      });
+    }
+
+    // Log antes de ejecutar la consulta
+    console.log("Insertando datos en la base de datos:", {
+      id_cliente,
+      id_paquete,
+      fecha_reserva,
+      hora_inicio,
+      hora_fin,
+      id_estado: id_estado || "Predeterminado: Pendiente",
+      id_local,
+      id_limusina,
+    });
+
+    // Insertar la reserva en la base de datos
+    const query = `
+      INSERT INTO public.reservas (
+        id_cliente,
+        id_paquete,
+        fecha_reserva,
+        hora_inicio,
+        hora_fin,
+        id_estado,
+        id_local,
+        id_limusina
+      ) VALUES (
+        $1, $2, $3, $4, $5,
+        COALESCE($6, (SELECT id_estado FROM estado WHERE nombre = 'Pendiente')),
+        $7, $8
+      ) RETURNING *;
+    `;
+
+    const values = [
+      id_cliente,
+      id_paquete,
+      fecha_reserva,
+      hora_inicio,
+      hora_fin,
+      id_estado || null,
+      id_local || null,
+      id_limusina || null,
+    ];
+
+    const result = await pool.query(query, values);
+
+    // Log de la respuesta de la base de datos
+    console.log("Datos insertados en la base de datos:", result.rows[0]);
+
+    // Responder al frontend
+    res.status(201).json({
+      message: "Reserva creada exitosamente",
+      reserva: result.rows[0],
+    });
+  } catch (err) {
+    console.error("Error al crear la reserva:", err.message);
+    res.status(500).json({ error: "Error al crear la reserva" });
+  }
 });
