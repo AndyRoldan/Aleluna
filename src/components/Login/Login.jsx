@@ -17,7 +17,7 @@ const Login = ({ onLogin }) => {
     setLoading(true);
 
     if (!email || !password) {
-      setError("Todos los campos son obligatorios");
+      setError('Todos los campos son obligatorios');
       setLoading(false);
       return;
     }
@@ -34,27 +34,17 @@ const Login = ({ onLogin }) => {
       const data = await response.json();
 
       if (response.ok) {
+        const { id_cliente, userName } = data;
+        console.log('Login exitoso, ID del usuario:', id_cliente);
+
+        // Guardar en localStorage
+        localStorage.setItem('isAuthenticated', true);
+        localStorage.setItem('userId', id_cliente);
+        localStorage.setItem('userName', userName);
+
+        // Redirigir al usuario y pasar los datos al callback
         setSuccess('Inicio de sesión exitoso');
-        setEmail('');
-        setPassword('');
-
-        const { userId, userName } = data;
-        console.log('Login exitoso, ID del usuario:', userId);
-
-        // **Guardar en localStorage**
-        localStorage.setItem('isAuthenticated', true); // Marcar al usuario como autenticado
-        localStorage.setItem('userId', userId); // Guardar el ID del usuario
-        localStorage.setItem('userName', userName); // Guardar el nombre del usuario
-
-        // **Verificar que el ID se guardó correctamente**
-        console.log("ID del usuario almacenado en localStorage:", localStorage.getItem('userId'));
-
-        // **Llamar al método onLogin (si existe)**
-        if (onLogin) {
-          onLogin(userId, userName);
-        }
-
-        // **Redirigir al usuario a la página principal**
+        onLogin(id_cliente, userName);
         navigate('/');
       } else {
         setError(data.error || 'Error en el inicio de sesión');
@@ -71,7 +61,7 @@ const Login = ({ onLogin }) => {
     <div className="login-container">
       <div className="login-box">
         <div className="logo">
-          <img src="https://i.ibb.co/6Ncyyz4/Logo-Aleluna.png" alt="Logo-Aleluna" />
+          <img src="https://i.ibb.co/6Ncyyz4/Logo-Aleluna.png" alt="Logo" />
         </div>
         <h2>Iniciar Sesión</h2>
         <form onSubmit={handleLogin}>
@@ -81,10 +71,8 @@ const Login = ({ onLogin }) => {
               placeholder="Correo electrónico"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={error && !email ? "input-error" : ""}
               required
             />
-            {error && !email && <div className="tooltip">El correo es obligatorio</div>}
           </div>
           <div className="tooltip-container">
             <input
@@ -92,12 +80,10 @@ const Login = ({ onLogin }) => {
               placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={error && !password ? "input-error" : ""}
               required
             />
-            {error && !password && <div className="tooltip">La contraseña es obligatoria</div>}
           </div>
-          <button className="primary-btn" type="submit" disabled={loading}>
+          <button type="submit" disabled={loading}>
             {loading ? 'Cargando...' : 'Iniciar Sesión'}
           </button>
           {error && <p className="error-text">{error}</p>}
@@ -112,3 +98,4 @@ const Login = ({ onLogin }) => {
 };
 
 export default Login;
+

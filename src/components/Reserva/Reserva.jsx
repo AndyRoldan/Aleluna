@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./reserva.css";
 
 const Reserva = () => {
-  const [id_cliente, setIdCliente] = useState(null); // Estado para almacenar el ID del cliente
+  const [id_cliente, setIdCliente] = useState(null);
   const [paquetes, setPaquetes] = useState([]);
   const [selectedPaquete, setSelectedPaquete] = useState(null);
   const [selectedPaqueteDetails, setSelectedPaqueteDetails] = useState(null);
@@ -17,11 +17,20 @@ const Reserva = () => {
   const [success, setSuccess] = useState(null);
   const [error, setError] = useState(null);
 
-  // Recuperar el ID del cliente desde localStorage al cargar el componente
+  // Recuperar el ID del cliente desde localStorage y convertirlo en un entero
   useEffect(() => {
     const storedIdCliente = localStorage.getItem("userId");
-    console.log("ID del cliente recuperado:", storedIdCliente);
-    setIdCliente(storedIdCliente); // Guardar el ID del cliente en el estado
+    if (storedIdCliente) {
+      const parsedId = parseInt(storedIdCliente, 10);
+      if (!isNaN(parsedId)) {
+        setIdCliente(parsedId);
+        console.log("ID del cliente establecido:", parsedId);
+      } else {
+        console.error("El ID del cliente en localStorage no es un número válido.");
+      }
+    } else {
+      console.error("ID del cliente no encontrado en localStorage.");
+    }
   }, []);
 
   // Cargar datos desde la API
@@ -30,7 +39,7 @@ const Reserva = () => {
       try {
         const response = await fetch(url);
         if (!response.ok) {
-          throw new Error("Error al cargar los datos");
+          throw new Error("Error al cargar los datos.");
         }
         const data = await response.json();
         setData(data);
@@ -47,7 +56,6 @@ const Reserva = () => {
 
   // Seleccionar paquete y obtener detalles
   const handlePaqueteChange = (id) => {
-    console.log(`Paquete seleccionado: ${id}`);
     setSelectedPaquete(id);
     const paquete = paquetes.find((pkg) => pkg.id === id);
     if (paquete) setSelectedPaqueteDetails(paquete);
@@ -55,7 +63,6 @@ const Reserva = () => {
 
   // Seleccionar local y obtener detalles
   const handleLocalChange = (id) => {
-    console.log(`Local seleccionado: ${id}`);
     setSelectedLocal(id);
     const local = locales.find((loc) => loc.id === id);
     if (local) setSelectedLocalDetails(local);
@@ -63,7 +70,6 @@ const Reserva = () => {
 
   // Seleccionar limosina
   const handleLimosinaChange = (id) => {
-    console.log(`Limosina seleccionada: ${id}`);
     setSelectedLimosina(id);
   };
 
@@ -78,11 +84,11 @@ const Reserva = () => {
       : null;
 
     const body = {
-      id_cliente: id_cliente,
+      id_cliente,
       id_paquete: selectedPaquete,
       id_local: selectedLocal,
       id_limusina: selectedLimosina,
-      fecha_reserva: fecha_reserva,
+      fecha_reserva,
       hora_inicio: horaInicio,
       hora_fin: horaFin,
     };
@@ -98,14 +104,12 @@ const Reserva = () => {
 
       if (!response.ok) {
         const data = await response.json();
-        console.error("Error recibido desde el backend:", data);
-        throw new Error(data.error || "Error al crear la reserva");
+        throw new Error(data.error || "Error al crear la reserva.");
       }
 
       const data = await response.json();
-      console.log("Respuesta recibida del backend:", data);
-
-      setSuccess("Reserva creada exitosamente");
+      console.log("Reserva creada:", data);
+      setSuccess("Reserva creada exitosamente.");
     } catch (err) {
       setError(err.message || "Ocurrió un error inesperado al crear la reserva.");
     }
@@ -167,7 +171,8 @@ const Reserva = () => {
                     value={limosina.id_limosina}
                     onChange={() => handleLimosinaChange(limosina.id_limosina)}
                   />
-                  {limosina.modelo} - Capacidad: {limosina.capacidad} - ${limosina.precio_por_hora}
+                  {limosina.modelo} - Capacidad: {limosina.capacidad} - $
+                  {limosina.precio_por_hora}
                 </label>
               </div>
             ))}
@@ -185,7 +190,8 @@ const Reserva = () => {
                     value={local.id}
                     onChange={() => handleLocalChange(local.id)}
                   />
-                  {local.nombre_local} - {local.direccion} - ${local.precio_por_hora}
+                  {local.nombre_local} - {local.direccion} - $
+                  {local.precio_por_hora}
                 </label>
               </div>
             ))}

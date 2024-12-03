@@ -50,7 +50,7 @@ app.post("/api/register", async (req, res) => {
 
 // Ruta para iniciar sesión
 app.post("/api/login", async (req, res) => {
-  const { email, password } = req.body;
+  const {id_cliente, email, password } = req.body;
 
   try {
     // Verificar si el usuario existe
@@ -64,7 +64,7 @@ app.post("/api/login", async (req, res) => {
     }
 
     const storedPassword = user.rows[0].password;
-    const userId = user.rows[0].id; // Verifica el nombre del campo aquí
+    const id_cliente = user.rows[0].id_cliente; // Verifica el nombre del campo aquí
     const userName = user.rows[0].nombre;
 
     // Comparar la contraseña con la almacenada en la base de datos
@@ -74,13 +74,13 @@ app.post("/api/login", async (req, res) => {
       return res.status(400).json({ error: 'Contraseña incorrecta' });
     }
 
-    console.log("Inicio de sesión exitoso para el usuario:", { userId, userName });
+    console.log("Inicio de sesión exitoso para el usuario:", { id_cliente, userName });
 
 
     // Devolver el ID y el nombre del usuario
     res.status(200).json({
       message: 'Inicio de sesión exitoso',
-      userId,
+      id_cliente,
       userName,
     });
   } catch (err) {

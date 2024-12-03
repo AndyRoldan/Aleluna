@@ -5,10 +5,11 @@ import Reserva from "./components/Reserva/Reserva";
 import Portafolio from "./components/Portafolio/Portafolio";
 import Login from './components/Login/Login';
 import Registro from './components/Registro/Registro';
+import Galeria1 from './components/Galerias/Galeria1/Galeria1';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userId, setUserId] = useState(null);
+  const [userId, setUserId] = useState();
   const [userName, setUserName] = useState('');
   const [selectedRuta, setSelectedRuta] = useState(null);
 
@@ -65,6 +66,8 @@ function App() {
         <Route path="/reserva" element={<Reserva isAuthenticated={isAuthenticated} userId={userId} selectedRuta={selectedRuta}/>} />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/registro" element={<Registro />} />
+        <Route path="/galeria1" element={<Galeria1 />} />
+
       </Routes>
     </Router>
   );
