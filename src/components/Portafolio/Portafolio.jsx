@@ -18,7 +18,9 @@ const Portafolio = () => {
         <Link to="/galeria1">
             <img src="https://i.ibb.co/QFXGfwB/248-A4596-2.jpg" alt="Evento 1" />
           </Link>
-          <img src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5" alt="Evento 2" />
+           <Link to="/galeria2">
+            <img src="https://i.ibb.co/BGHZLVt/248A7145.jpg" alt="Evento 2" />
+          </Link>
           <img src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5" alt="Evento 3" />
           <img src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5" alt="Evento 4" />
         </div>

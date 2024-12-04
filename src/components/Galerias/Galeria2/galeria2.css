@@ -19,8 +19,8 @@ body {
 }
 
 /* Sección de Introducción */
-.intro-section1 {
-  background-image: url('https://i.ibb.co/CvxG3Jn/Jaymi-107.jpg');
+.intro-section2 {
+  background-image: url('https://i.ibb.co/BGHZLVt/248A7145.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -32,7 +32,7 @@ body {
   min-height: 60vh;
 }
 
-.intro-section1::before {
+.intro-section2::before {
   content: "";
   position: absolute;
   top: 0;
@@ -43,7 +43,7 @@ body {
   z-index: 1;
 }
 
-.intro-section1 h1 {
+.intro-section2 h1 {
     font-family: "Allura", cursive;
     color: white  ;
     font-size: 10em;
@@ -60,7 +60,7 @@ body {
     margin-bottom: 100px; /* Añade este margen para separar del p */
   }
 
-.intro-section1 p {
+.intro-section2 p {
   font-size: 1.5em;
   max-width: 700px;
   margin: 0 auto;

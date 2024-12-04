@@ -6,6 +6,10 @@ import Portafolio from "./components/Portafolio/Portafolio";
 import Login from './components/Login/Login';
 import Registro from './components/Registro/Registro';
 import Galeria1 from './components/Galerias/Galeria1/Galeria1';
+import Galeria2 from './components/Galerias/Galeria2/Galeria2';
+//import Galeria3 from './components/Galerias/Galeria1/Galeria1';
+//import Galeria4 from './components/Galerias/Galeria1/Galeria1';
+import Pago from './components/Pago/Pago';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -67,6 +71,8 @@ function App() {
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/galeria1" element={<Galeria1 />} />
+        <Route path="/galeria2" element={<Galeria2 />} />
+        <Route path="/pago" element={<Pago />} />
 
       </Routes>
     </Router>

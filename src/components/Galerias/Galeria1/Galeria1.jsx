@@ -49,7 +49,7 @@ const Galeria1 = () => {
   return (
     <div className="gallery-container">
       {/* Sección de Introducción */}
-      <section className="intro-section">
+      <section className="intro-section1">
         <h1>Jaymi Quintanilla</h1>
         <p>“La magia existe si tú decides que así sea”</p>
       </section>
