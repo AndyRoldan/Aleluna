@@ -291,9 +291,8 @@ const Reserva = () => {
               onChange={(e) => setEstadoPago(e.target.value)}
             >
               <option value="">Seleccione un estado</option>
-              <option value="1">Pendiente</option>
-              <option value="2">Pagado</option>
-              <option value="3">Cancelado</option>
+              <option value="4">Confirmada</option>
+              <option value="5">Completada</option>
             </select>
           </label>
           <button type="submit">Registrar Pago</button>
