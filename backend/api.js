@@ -50,7 +50,7 @@ app.post("/api/register", async (req, res) => {
 
 // Ruta para iniciar sesión
 app.post("/api/login", async (req, res) => {
-  const { email, password } = req.body;
+  const {id_cliente, email, password } = req.body;
 
   try {
     // Verificar si el usuario existe
@@ -64,7 +64,7 @@ app.post("/api/login", async (req, res) => {
     }
 
     const storedPassword = user.rows[0].password;
-    const userId = user.rows[0].id; // Verifica el nombre del campo aquí
+    const id_cliente = user.rows[0].id_cliente; // Verifica el nombre del campo aquí
     const userName = user.rows[0].nombre;
 
     // Comparar la contraseña con la almacenada en la base de datos
@@ -74,13 +74,13 @@ app.post("/api/login", async (req, res) => {
       return res.status(400).json({ error: 'Contraseña incorrecta' });
     }
 
-    console.log("Inicio de sesión exitoso para el usuario:", { userId, userName });
+    console.log("Inicio de sesión exitoso para el usuario:", { id_cliente, userName });
 
 
     // Devolver el ID y el nombre del usuario
     res.status(200).json({
       message: 'Inicio de sesión exitoso',
-      userId,
+      id_cliente,
       userName,
     });
   } catch (err) {
@@ -266,3 +266,39 @@ app.post("/api/reservas", async (req, res) => {
     res.status(500).json({ error: "Error al crear la reserva" });
   }
 });
+
+
+
+//**************************************************************************************************************************************************************
+//*******************************************************************RESERVAS******************************************************************************************* */
+app.post("/api/pagos", async (req, res) => {
+  const { monto, metodoPago, fechaPago, idReserva, idEstado } = req.body;
+
+  console.log("Datos recibidos en el backend:", req.body); // Verifica que `idReserva` no sea undefined
+
+  if (!monto || !metodoPago || !fechaPago || !idReserva || !idEstado) {
+    return res.status(400).json({ error: "Todos los campos son obligatorios." });
+  }
+
+  try {
+    const query = `
+      INSERT INTO public.pagos (monto, metodo_pago, fecha_pago, id_reserva, id_estado)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *;
+    `;
+    const values = [monto, metodoPago, fechaPago, idReserva, idEstado];
+
+    const result = await pool.query(query, values);
+    res.status(201).json({
+      message: "Pago procesado exitosamente",
+      pago: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Error al insertar el pago:", error.message);
+    res.status(500).json({ error: "Error al procesar el pago." });
+  }
+});
+
+
+
+
